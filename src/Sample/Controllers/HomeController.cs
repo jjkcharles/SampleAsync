@@ -16,7 +16,7 @@ namespace Sample.Controllers
             _dbContext = dbContext;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var vm = new ViewModel();
             try
@@ -31,7 +31,7 @@ namespace Sample.Controllers
                 _dbContext.Add(new TestTable() { SomeColumn = max + 1 });
                 _dbContext.SaveChanges();
 
-                MakePostCallAsync("http:\\google.com", vm);
+                await MakePostCallAsync("http:\\google.com", vm).ConfigureAwait(true);
 
                 if (!string.IsNullOrEmpty(vm.TextToDisplay))
                 {
@@ -51,15 +51,13 @@ namespace Sample.Controllers
             return View("Index", vm);
         }
 
-        private async void MakePostCallAsync(string url, ViewModel vm)
+        private async Task MakePostCallAsync(string url, ViewModel vm)
         {
             var httpClient = new HttpClient();
 
             var httpResponse = await httpClient.PostAsync("http://google.com", null).ConfigureAwait(true);
 
             newmax = _dbContext.OnlyTable.Max(x => x.SomeColumn);
-
-            newmax = 1;
         }
     }
 
